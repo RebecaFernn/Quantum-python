@@ -12,9 +12,15 @@ def formatando(num: float) -> float:
 def convertendoGB(retorno: int) -> float:
     calculo = retorno / (1024**3)
     return formatando(calculo)
-    
-print(f"Disco Usado: {convertendoGB(discoUsado)} ({perUsado}%)")
-print(f"Disco Livre: {convertendoGB(discolivre)}")
-print(f"Disco Total: {convertendoGB(discoTotal)}")
 
-time.sleep(3)
+def horario() -> str:
+    horarioInicio = time.time()
+    horarioAtual = time.localtime(horarioInicio)
+    horarioFormatado = time.strftime("%d/%m/%Y %H:%M:%S", horarioAtual)
+    return horarioFormatado
+    
+print(f"Disco Usado: {convertendoGB(discoUsado)} ({perUsado}%) // Data: {horario()}")
+print(f"Disco Livre: {convertendoGB(discolivre)} // Data: {horario()}")
+print(f"Disco Total: {convertendoGB(discoTotal)} // Data: {horario()}")
+
+time.sleep(1)

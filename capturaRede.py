@@ -1,21 +1,15 @@
 import psutil
 import time
-from mysql.connector import connect, Error
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-
-config = {
-    'user': os.getenv("DB_USER"),
-    'password': os.getenv("DB_PASSWD"),
-    'host': os.getenv("DB_HOST"),
-    'database': os.getenv("DB"),
-}
 
 pacotesTotal = 0
 pacotesPerdidos = 0
 perdaPorcentagem = 0
+
+def horario() -> str:
+    horarioInicio = time.time()
+    horarioAtual = time.localtime(horarioInicio)
+    horarioFormatado = time.strftime("%d/%m/%Y %H:%M:%S", horarioAtual)
+    return horarioFormatado
 
 i = 0
 while i < 5:
@@ -30,11 +24,11 @@ while i < 5:
      pacotesTotal += pacotesEnviado + pacotesRecebido
      pacotesPerdidos += dropin + dropout
      
-     print(f"{i + 1} - Pacotes Enviados: ", pacotesEnviado)
-     print(f"{i + 1} - Pacotes Recebidos: ", pacotesRecebido)
+     print(f"{i + 1} - Pacotes Enviados: {pacotesEnviado} // Data: {horario()}")
+     print(f"{i + 1} - Pacotes Recebidos: {pacotesRecebido} // Data: {horario()}")
       
      i += 1
-     time.sleep(3)
+     time.sleep(2)
      
 if pacotesPerdidos > 0:    
     perdaPorcentagem = (pacotesPerdidos / pacotesTotal) * 100 
@@ -44,33 +38,6 @@ else:
 print("Pacotes Total: ", pacotesTotal)
 print("Porcentagem de Perda: {:.2f}%".format(perdaPorcentagem))
 
-if perdaPorcentagem >= 2:
-    print("ALERTA! Perdas altas de pacotes: {:.2f}%".format(perdaPorcentagem))
-    try:
-        db = connect(**config)
-        if db.is_connected():
-         db_info = db.get_server_info()
-         print('Connected to MySQL server version - \n', db_info)
-         
-         with db.cursor() as cursor:
-             query = ("INSERT INTO registro VALUES "
-                     "(null, current_timestamp(), 'Perdas alta de pacote', %s)")
-             value = [perdaPorcentagem]
-             cursor.execute(query, value)
-             db.commit()
-             print(cursor.rowcount, "registro inserido")
-         cursor.close()
-    except Error as e:
-        print('Error to connect with MySQL -', e)  
-             
-    finally:
-        if db is not None and db.is_connected():
-            cursor.close()
-            db.close()
-            print("MySQL connection is closed")
 
-
-     
-    
      
      
